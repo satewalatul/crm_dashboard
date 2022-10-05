@@ -390,67 +390,96 @@ class CRMLead(models.Model):
     @api.model
     def get_top_sp_revenue(self):
         """Top 10 Salesperson revenue Table"""
-        user = self.env.user
+        lead = self.env['crm.lead']
 
-        self._cr.execute('''SELECT user_id,id,expected_revenue,name,company_id
-        from crm_lead where expected_revenue is not null AND user_id = %s
-        GROUP BY user_id,id order by expected_revenue DESC limit 10''' % user.id)
+        self._cr.execute('''SELECT lead_qual,count(id),count(case when type = 'opportunity' then 1 else null end)
+                       from crm_lead where lead_qual is not null
+                       group by lead_qual''')
+
         data1 = self._cr.fetchall()
-
         top_revenue = []
+
         for rec in data1:
-            company_id = rec[4]
-            user_id = rec[0]
-            company_id_obj = self.env['res.company'].browse(company_id)
-            user_id_obj = self.env['res.users'].browse(user_id)
-            currency = company_id_obj.currency_id.symbol
+            # lead_qual = rec[0]
+            # company_id_obj = self.env['res.company'].browse(company_id)
+            # user_id_obj = self.env['res.users'].browse(user_id)
+            # currency = company_id_obj.currency_id.symbol
             rec_list = list(rec)
-            rec_list[0] = user_id_obj.name
-            rec_list.append(currency)
+            rec_list[0] = rec[0]
+            rec_list[1] = rec[1]
+            rec_list[2] = rec[2]
             top_revenue.append(rec_list)
 
         return {'top_revenue': top_revenue}
 
     @api.model
     def get_country_revenue(self):
-        """Top 10 Country Wise Revenue - Heat Map"""
-        company_id = self.env.company.id
-        self._cr.execute('''select country_id, sum(expected_revenue) from crm_lead
-            where expected_revenue is not null AND country_id is not null
-            group by country_id order by sum(expected_revenue) desc limit 10''')
+        self._cr.execute('''select utm_source.name,count(case when utm_source.id=crm_lead.source_id then 1 else null end) from utm_source,crm_lead where (crm_lead.create_date >= (CURRENT_DATE - INTERVAL '1 day') and crm_lead.create_date <= (CURRENT_DATE + INTERVAL '1 day'))
+group by utm_source.name''')
         data1 = self._cr.fetchall()
 
         country_revenue = []
         for rec in data1:
-            country_id = rec[0]
-            company_id_obj = self.env['res.company'].browse(company_id)
-            country_id_obj = self.env['res.country'].browse(country_id)
-            currency = company_id_obj.currency_id.symbol
             rec_list = list(rec)
-            rec_list[0] = country_id_obj.name
-            rec_list.append(currency)
+            rec_list[0] = rec[0]
+            rec_list[1] = rec[1]
             country_revenue.append(rec_list)
-
         return {'country_revenue': country_revenue}
 
     @api.model
     def get_country_count(self):
-        """Top 10 Country Wise Count - Heat Map"""
-        self._cr.execute('''select country_id,count(*) from crm_lead where country_id is not null
-        group by country_id order by count(*) desc limit 10''')
-        data1 = self._cr.fetchall()
-
+        """Top 10 Deals Table"""
+        self._cr.execute(
+            '''select res_partner.name as name,crm_team_member.user_id as user_id from crm_team_member,crm_team, res_partner, res_users where crm_team_member.crm_team_id = crm_team.id and crm_team_member.user_id=res_users.id and crm_team.name ilike '%inside sales%' and res_users.id=crm_team_member.user_id and res_partner.email ilike res_users.login and crm_team_member.active=true and res_partner.is_company=false;''')
+        each_user = self._cr.fetchall()
         country_count = []
-        for rec in data1:
-            country_id = rec[0]
-            country_id_obj = self.env['res.country'].browse(country_id)
-            rec_list = list(rec)
-            rec_list[0] = country_id_obj.name
-            country_count.append(rec_list)
+        for each in each_user:
+            rec = list(each)
+
+            self._cr.execute(
+                '''SELECT COUNT(crm_lead.id) FROM crm_lead WHERE (create_date >= (CURRENT_DATE - INTERVAL '1 month') and create_date <= (CURRENT_DATE + INTERVAL '1 day')) and type='opportunity' and crm_lead.user_id= %s''' %
+                rec[1])
+            records1 = self._cr.fetchall()
+
+            for a in records1:
+                rec.append(a[0])
+
+            self._cr.execute(
+                '''select count(crm_lead.id) as won from crm_lead where (create_date >= (CURRENT_DATE - INTERVAL '1 month') and create_date <= (CURRENT_DATE + INTERVAL '1 day')) and crm_lead.stage_id=4 and crm_lead.user_id= %s;''' %
+                rec[1])
+            records2 = self._cr.fetchall()
+
+            for a in records2:
+                rec.append(a[0])
+
+            self._cr.execute(
+                '''select count(crm_lead.id) as lost from crm_lead where (create_date >= (CURRENT_DATE - INTERVAL '1 month') and create_date <= (CURRENT_DATE + INTERVAL '1 day')) and crm_lead.active='false' and type = 'opportunity' and crm_lead.user_id=%s;''' %
+                rec[1])
+            records3 = self._cr.fetchall()
+
+            for a in records3:
+                rec.append(a[0])
+
+            self._cr.execute(
+                '''select  count(crm_lead.id) as Infollow from crm_lead where (create_date >= (CURRENT_DATE - INTERVAL '1 month') and create_date <= (CURRENT_DATE + INTERVAL '1 day')) and crm_lead.stage_id=3 and crm_lead.user_id=%s;''' %
+                rec[1])
+            records4 = self._cr.fetchall()
+
+            for a in records4:
+                rec.append(a[0])
+
+            self._cr.execute(
+                '''select sum(expected_revenue) from crm_lead where (create_date >= (CURRENT_DATE - INTERVAL '1 month') and create_date <= (CURRENT_DATE + INTERVAL '1 day')) and crm_lead.user_id= %s''' %
+                rec[1])
+            records5 = self._cr.fetchall()
+            for a in records5:
+                rec.append(a[0])
+
+            country_count.append(rec)
 
         return {'country_count': country_count}
 
-    @api.model
+@api.model
     def get_total_lost_crm(self, option):
         """Lost Opportunity or Lead Graph"""
         month_dict = {}
