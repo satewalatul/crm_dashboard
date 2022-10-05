@@ -54,8 +54,8 @@
             </field>
         </record>
 
-        <menuitem name="Dashboard" id="menu_crm_dashboard_new" parent="crm.crm_menu_root"
+        <menuitem name="Dashboard" id="menu_crm_dashboard_new"
                   sequence="0" action="action_crm_lead_all_dashboard"/>
-        <menuitem id="crm.crm_menu_root" action="action_crm_lead_all_dashboard"/>
+<!--        <menuitem id="crm.crm_menu_root" action="action_crm_lead_all_dashboard"/>-->
     </data>
 </odoo>
