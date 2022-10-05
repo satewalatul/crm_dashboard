@@ -479,7 +479,7 @@ group by utm_source.name''')
 
         return {'country_count': country_count}
 
-@api.model
+    @api.model
     def get_total_lost_crm(self, option):
         """Lost Opportunity or Lead Graph"""
         month_dict = {}
