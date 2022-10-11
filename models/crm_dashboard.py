@@ -414,7 +414,7 @@ class CRMLead(models.Model):
 
     @api.model
     def get_country_revenue(self):
-        self._cr.execute('''select utm_source.name,count(case when utm_source.id=crm_lead.source_id then 1 else null end), count(case when utm_source.id=crm_lead.source_id and crm_lead.type = 'opportunity' then 1 else null end) from utm_source,crm_lead where utm_source.name != 'OLD'
+        self._cr.execute('''select utm_source.name,count(case when utm_source.id=crm_lead.source_id then 1 else null end), count(case when utm_source.id=crm_lead.source_id then 1 else null end) from utm_source,crm_lead where crm_lead.create_date >= CURRENT_DATE and utm_source.name != 'OLD'
 group by utm_source.name''')
         data1 = self._cr.fetchall()
 
