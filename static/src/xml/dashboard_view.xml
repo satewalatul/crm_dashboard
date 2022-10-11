@@ -412,7 +412,7 @@
                                 <tr>
                                     <th>Source</th>
                                     <th>Leads</th>
-<!--                                    <th>Opportunities</th>-->
+                                    <th>Opportunities</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -420,6 +420,7 @@
                                     <tr>
                                         <td><t t-esc="activity[0]"/></td>
                                         <td><t t-esc="activity[1]"/></td>
+                                        <td><t t-esc="activity[2]"/></td>
                                     </tr>
                                 </t>
                             </tbody>
