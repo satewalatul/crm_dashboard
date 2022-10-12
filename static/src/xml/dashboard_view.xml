@@ -442,7 +442,7 @@
 
                 <div class="top_country_count_div col-12 col-sm-12 col-md-4">
                     <div class="chart-container card-shadow">
-                        <h3 class="h5">Revenue</h3>
+                        <h3 class="h5">Salesperson</h3>
                         <hr/>
                         <table class="table table-hover" id="country_count_table">
                             <thead>

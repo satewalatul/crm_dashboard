@@ -25,7 +25,7 @@
     'summary': """CRM dashboard module brings a multipurpose graphical dashboard"""
                """ for CRM module and making the relationship management better and easier""",
     'category': 'Sales',
-    'version': '15.0.1.0.6',
+    'version': '15.0.1.0.7',
     'author': 'Cybrosys Techno Solutions',
     'company': 'Cybrosys Techno Solutions',
     'maintainer': 'Cybrosys Techno Solutions',
@@ -33,6 +33,7 @@
     'depends': ['base', 'crm', 'sale_management'],
     'data': [
         'views/dashboard_view.xml',
+        'views/crm_views.xml'
     ],
     'assets': {
         'web.assets_backend': [
