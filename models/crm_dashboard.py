@@ -392,8 +392,8 @@ class CRMLead(models.Model):
         """Top 10 Salesperson revenue Table"""
         lead = self.env['crm.lead']
 
-        self._cr.execute('''SELECT lead_qual,count(id),count(case when type = 'opportunity' then 1 else null end)
-                       from crm_lead where lead_qual is not null
+        self._cr.execute('''SELECT lead_qual,count(case when type = 'lead' and active='true' then 1 else null end),count(case when type = 'opportunity' and active='true' then 1 else null end),count(case when stage_id=4 then 1 else null end),count(case when active='false' then 1 else null end),count(case when stage_id=3 then 1 else null end)
+                       from crm_lead where create_date>=date_trunc('month', CURRENT_DATE) and lead_qual is not null
                        group by lead_qual''')
 
         data1 = self._cr.fetchall()
@@ -408,13 +408,18 @@ class CRMLead(models.Model):
             rec_list[0] = rec[0]
             rec_list[1] = rec[1]
             rec_list[2] = rec[2]
+            rec_list[3] = rec[3]
+            rec_list[4] = rec[4]
+            rec_list[5] = rec[5]
             top_revenue.append(rec_list)
 
         return {'top_revenue': top_revenue}
 
     @api.model
     def get_country_revenue(self):
-        self._cr.execute('''select utm_source.name,count(case when utm_source.id=crm_lead.source_id and crm_lead.type = 'lead' and crm_lead.active='true' then 1 else null end), count(case when utm_source.id=crm_lead.source_id and crm_lead.type = 'opportunity' and crm_lead.active='true' then 1 else null end) from utm_source,crm_lead where utm_source.name != 'OLD' group by utm_source.name''')
+        self._cr.execute('''select utm_source.name,count(case when utm_source.id=crm_lead.source_id and crm_lead.type = 'lead' and crm_lead.active='true' then 1 else null end), count(case when utm_source.id=crm_lead.source_id and crm_lead.type = 'opportunity' and crm_lead.active='true' then 1 else null end),
+        count(case when utm_source.id=crm_lead.source_id and crm_lead.stage_id=4 then 1 else null end),count(case when utm_source.id=crm_lead.source_id and crm_lead.active='false' then 1 else null end),count(case when utm_source.id=crm_lead.source_id and crm_lead.stage_id=3 then 1 else null end)
+        from utm_source,crm_lead where crm_lead.create_date>=date_trunc('month', CURRENT_DATE) and utm_source.name != 'OLD' group by utm_source.name''')
         data1 = self._cr.fetchall()
 
         country_revenue = []
@@ -423,6 +428,9 @@ class CRMLead(models.Model):
             rec_list[0] = rec[0]
             rec_list[1] = rec[1]
             rec_list[2] = rec[2]
+            rec_list[3] = rec[3]
+            rec_list[4] = rec[4]
+            rec_list[5] = rec[5]
             country_revenue.append(rec_list)
         return {'country_revenue': country_revenue}
 
@@ -437,7 +445,7 @@ class CRMLead(models.Model):
             rec = list(each)
 
             self._cr.execute(
-                '''SELECT COUNT(crm_lead.id) FROM crm_lead WHERE (create_date >= (CURRENT_DATE - INTERVAL '1 month') and create_date <= (CURRENT_DATE + INTERVAL '1 day')) and type='opportunity' and crm_lead.user_id= %s''' %
+                '''SELECT COUNT(crm_lead.id) FROM crm_lead WHERE create_date>=date_trunc('month', CURRENT_DATE) and type='opportunity' and crm_lead.user_id= %s''' %
                 rec[1])
             records1 = self._cr.fetchall()
 
@@ -445,7 +453,7 @@ class CRMLead(models.Model):
                 rec.append(a[0])
 
             self._cr.execute(
-                '''select count(crm_lead.id) as won from crm_lead where (create_date >= (CURRENT_DATE - INTERVAL '1 month') and create_date <= (CURRENT_DATE + INTERVAL '1 day')) and crm_lead.stage_id=4 and crm_lead.user_id= %s;''' %
+                '''select count(crm_lead.id) as won from crm_lead where create_date>=date_trunc('month', CURRENT_DATE) and crm_lead.stage_id=4 and crm_lead.user_id= %s;''' %
                 rec[1])
             records2 = self._cr.fetchall()
 
@@ -453,7 +461,7 @@ class CRMLead(models.Model):
                 rec.append(a[0])
 
             self._cr.execute(
-                '''select count(crm_lead.id) as lost from crm_lead where (create_date >= (CURRENT_DATE - INTERVAL '1 month') and create_date <= (CURRENT_DATE + INTERVAL '1 day')) and crm_lead.active='false' and type = 'opportunity' and crm_lead.user_id=%s;''' %
+                '''select count(crm_lead.id) as lost from crm_lead where create_date>=date_trunc('month', CURRENT_DATE) and crm_lead.active='false' and type = 'opportunity' and crm_lead.user_id=%s;''' %
                 rec[1])
             records3 = self._cr.fetchall()
 
@@ -461,7 +469,7 @@ class CRMLead(models.Model):
                 rec.append(a[0])
 
             self._cr.execute(
-                '''select  count(crm_lead.id) as Infollow from crm_lead where (create_date >= (CURRENT_DATE - INTERVAL '1 month') and create_date <= (CURRENT_DATE + INTERVAL '1 day')) and crm_lead.stage_id=3 and crm_lead.user_id=%s;''' %
+                '''select  count(crm_lead.id) as Infollow from crm_lead where create_date>=date_trunc('month', CURRENT_DATE) and crm_lead.stage_id=3 and crm_lead.user_id=%s;''' %
                 rec[1])
             records4 = self._cr.fetchall()
 
@@ -469,7 +477,7 @@ class CRMLead(models.Model):
                 rec.append(a[0])
 
             self._cr.execute(
-                '''select sum(expected_revenue) from crm_lead where (create_date >= (CURRENT_DATE - INTERVAL '1 month') and create_date <= (CURRENT_DATE + INTERVAL '1 day')) and crm_lead.user_id= %s''' %
+                '''select sum(expected_revenue) from crm_lead where create_date>=date_trunc('month', CURRENT_DATE) and crm_lead.user_id= %s''' %
                 rec[1])
             records5 = self._cr.fetchall()
             for a in records5:
