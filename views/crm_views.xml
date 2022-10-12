@@ -5,6 +5,9 @@
             <field name="model">crm.lead</field>
             <field name="inherit_id" ref="crm.view_crm_case_opportunities_filter"/>
             <field name="arch" type="xml">
+                <xpath expr="//filter[@name='open_opportunities']" position="after">
+                        <filter string="Inside Sales" name="inside_sales" domain="[('team_id', '=', 'Inside Sales')]"/>
+                </xpath>
                 <xpath expr="//filter[@name='saleschannel']" position="after">
                     <filter string="OPS Opportunities" name="opsoppo" context="{'group_by':'lead_qual'}"/>
                 </xpath>
@@ -17,6 +20,9 @@
             <field name="model">crm.lead</field>
             <field name="inherit_id" ref="crm.view_crm_case_leads_filter"/>
             <field name="arch" type="xml">
+                <xpath expr="//filter[@name='unassigned_leads']" position="after">
+                        <filter string="Inside Sales" name="inside_sales" domain="[('team_id', '=', 'Inside Sales')]"/>
+                </xpath>
                 <xpath expr="//filter[@name='saleschannel']" position="after">
                     <filter string="OPS Leads" name="opsleads" context="{'group_by':'lead_qual'}"/>
                     <filter string="Stage" name="stage_id" context="{'group_by':'stage_id'}"/>
