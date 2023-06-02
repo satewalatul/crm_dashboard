@@ -9,7 +9,7 @@
                         <filter string="Inside Sales" name="inside_sales" domain="[('team_id', '=', 'Inside Sales')]"/>
                 </xpath>
                 <xpath expr="//filter[@name='saleschannel']" position="after">
-                    <filter string="OPS Opportunities" name="opsoppo" context="{'group_by':'lead_qual'}"/>
+                    <filter string="OPS Opportunities" name="opsoppo" context="{'group_by':'lead_qualifier'}"/>
                 </xpath>
 
             </field>
@@ -24,7 +24,7 @@
                         <filter string="Inside Sales" name="inside_sales" domain="[('team_id', '=', 'Inside Sales')]"/>
                 </xpath>
                 <xpath expr="//filter[@name='saleschannel']" position="after">
-                    <filter string="OPS Leads" name="opsleads" context="{'group_by':'lead_qual'}"/>
+                    <filter string="OPS Leads" name="opsleads" context="{'group_by':'lead_qualifier'}"/>
                     <filter string="Stage" name="stage_id" context="{'group_by':'stage_id'}"/>
                 </xpath>
 

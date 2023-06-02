@@ -1,4 +1,4 @@
-""""CRM Dashboard"""
+''""""CRM Dashboard"""
 # -*- coding: utf-8 -*-
 #############################################################################
 #
@@ -392,9 +392,9 @@ class CRMLead(models.Model):
         """Top 10 Salesperson revenue Table"""
         lead = self.env['crm.lead']
 
-        self._cr.execute('''SELECT lead_qual,count(case when type = 'lead' and active='true' then 1 else null end),count(case when type = 'opportunity' and active='true' then 1 else null end),count(case when stage_id=4 then 1 else null end),count(case when active='false' then 1 else null end),count(case when stage_id=3 then 1 else null end)
-                       from crm_lead where create_date>=date_trunc('month', CURRENT_DATE) and lead_qual is not null
-                       group by lead_qual''')
+        self._cr.execute('''SELECT lead_qualifier,count(case when type = 'lead' and active='true' then 1 else null end),count(case when type = 'opportunity' and active='true' then 1 else null end),count(case when stage_id=4 then 1 else null end),count(case when active='false' then 1 else null end),count(case when stage_id=3 then 1 else null end)
+                       from crm_lead where create_date>=date_trunc('month', CURRENT_DATE) and lead_qualifier is not null
+                       group by lead_qualifier''')
 
         data1 = self._cr.fetchall()
         top_revenue = []
